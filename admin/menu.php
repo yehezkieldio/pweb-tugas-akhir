@@ -72,9 +72,24 @@ if (isset($_GET['action'])) {
     }
 }
 
-// Fetch all menu items
-$query = "SELECT * FROM menu ORDER BY nama";
+// Pagination settings
+$itemsPerPage = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = max($page, 1); // Ensure page is at least 1
+
+// Calculate total pages
+$totalItemsQuery = "SELECT COUNT(*) as total FROM menu";
+$totalItemsResult = $conn->query($totalItemsQuery);
+$totalItems = $totalItemsResult->fetch_assoc()['total'];
+$totalPages = ceil($totalItems / $itemsPerPage);
+
+// Calculate offset for current page
+$offset = ($page - 1) * $itemsPerPage;
+
+// Fetch menu items with limit and offset, ordered by id in ascending order
+$query = "SELECT * FROM menu ORDER BY id ASC LIMIT ? OFFSET ?";
 $stmt = $conn->prepare($query);
+$stmt->bind_param("ii", $itemsPerPage, $offset);
 $stmt->execute();
 $result = $stmt->get_result();
 $menu_items = [];
@@ -91,6 +106,44 @@ while ($row = $result->fetch_assoc()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIMANRES - Admin Menu</title>
     <link rel="stylesheet" href="../style.css">
+    <style>
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .pagination ul {
+            list-style: none;
+            padding: 0;
+            display: inline-block;
+        }
+
+        .pagination ul li {
+            display: inline;
+            margin: 0 5px;
+        }
+
+        .pagination ul li a {
+            text-decoration: none;
+            padding: 5px 10px;
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+
+        .pagination ul li a:hover {
+            background-color:rgb(25, 36, 63);
+        }
+
+        .pagination ul li a.active {
+            background-color: #007bff;
+            color: #fff;
+            pointer-events: none;
+            border-color: #007bff;
+        }
+    </style>
 </head>
 
 <body>
@@ -161,9 +214,7 @@ while ($row = $result->fetch_assoc()) {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php 
-                            sort($menu_items);
-                            foreach ($menu_items as $key => $item): ?>
+                            <?php foreach ($menu_items as $key => $item): ?>
                                 <tr>
                                     <td><?= htmlspecialchars($item['id']) ?></td>
                                     <td><?= htmlspecialchars($item['nama']) ?></td>
@@ -178,6 +229,27 @@ while ($row = $result->fetch_assoc()) {
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            <div class="pagination">
+                <?php if ($totalPages > 1): ?>
+                    <ul>
+                        <?php if ($page > 1): ?>
+                            <li><a href="menu.php?page=<?= $page - 1 ?>">Sebelumnya</a></li>
+                        <?php endif; ?>
+
+                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                            <li>
+                                <a href="menu.php?page=<?= $i ?>"
+                                    class="<?= $i == $page ? 'active' : '' ?>"><?= $i ?></a>
+                            </li>
+                        <?php endfor; ?>
+
+                        <?php if ($page < $totalPages): ?>
+                            <li><a href="menu.php?page=<?= $page + 1 ?>">Berikutnya</a></li>
+                        <?php endif; ?>
+                    </ul>
+                <?php endif; ?>
             </div>
         </div>
     </div>
