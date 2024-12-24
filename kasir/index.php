@@ -21,10 +21,12 @@ $isKasirUser = isKasir();
 </head>
 
 <body>
-    <div>
+    <div class="layout">
         <?php include_once "../sidebar.php" ?>
-        <div>
-
+        <div class="main-content">
+            <p>
+                lorem ipsum
+            </p>
         </div>
     </div>
 
