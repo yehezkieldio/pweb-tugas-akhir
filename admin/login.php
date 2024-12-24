@@ -1,46 +1,50 @@
 <?php
 
-include_once 'config.php';
-include_once 'session.php';
+include_once '../config.php';
+include_once '../session.php';
 
-alreadyLogin();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'];
+    $username = $_POST['username'];
     $password = $_POST['password'];
 
     // validate all input fields
     $error = "";
 
-    if (empty($email) || empty($password)) {
-        $error = "Email dan password harus diisi.";
-    } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Format email tidak valid.";
+    if (empty($username) || empty($password)) {
+        $error = "Username dan password harus diisi.";
     }
 
     if (empty($error)) {
-        $query = "SELECT * FROM pelanggan WHERE email = ?";
+        $query = "SELECT * FROM user WHERE username = ?";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("s", $email);
+        $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             $user = $result->fetch_assoc();
             if (password_verify($password, $user['password'])) {
-                $_SESSION['user'] = [
+                if ($user['role'] != 'admin') {
+                    $error = "Anda tidak memiliki akses.";
+                    exit();
+                }
+
+                $_SESSION['admin'] = [
                     'id' => $user['id'],
                     'nama' => $user['nama'],
-                    'email' => $user['email']
+                    'username' => $user['username'],
+                    'role' => $user['role']
                 ];
+                $_SESSION['role'] = $user['role'];
 
-                header("Location: reservasi.php");
+                header("Location: index.php");
                 exit();
             } else {
                 $error = "Password salah.";
             }
         } else {
-            $error = "Email tidak terdaftar.";
+            $error = "Username tidak terdaftar.";
 
         }
     }
@@ -55,23 +59,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIMANRES - Login</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
 </head>
 
 <body>
     <div>
         <header class="form-header">
-            <h2>Login</h2>
-            <p>
-                Belum punya akun? <a href="register.php">Register</a>
-            </p>
+            <h2>Login Sistem</h2>
         </header>
         <?php if (isset($error))
             echo "<p class='error-form'>$error</p>"; ?>
         <form class="register-form" method="POST">
             <div>
-                <label>Email:</label>
-                <input type="email" name="email" required>
+                <label>Username:</label>
+                <input type="text" name="username" required>
             </div>
             <div>
                 <label>Password:</label>

@@ -1,13 +1,15 @@
 <?php
 
 include_once 'session.php';
+include_once 'config.php';
+
+checkLogin();
 
 if (!isset($_SESSION['reservasi_id']) || !isset($_POST['total'])) {
     header("Location: test.php");
     exit();
 }
 
-include_once 'config.php';
 
 try {
     mysqli_begin_transaction($conn);

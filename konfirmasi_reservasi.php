@@ -3,6 +3,8 @@
 include_once 'config.php';
 include_once 'session.php';
 
+checkLogin();
+
 if (!isset($_SESSION['reservasi'])) {
     header("Location: reservasi.php");
     exit();
@@ -10,17 +12,19 @@ if (!isset($_SESSION['reservasi'])) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $reservasi = $_SESSION['reservasi'];
+    error_log(print_r($reservasi, true));
 
-    $query = "INSERT INTO reservasi (tanggal, waktu, jumlah_tamu, meja_id, status)
-              VALUES (?, ?, ?, ?, 'terkonfirmasi')";
+    $query = "INSERT INTO reservasi (tanggal, waktu, jumlah_tamu, meja_id, pelanggan_id, status)
+              VALUES (?, ?, ?, ?, ?, 'terkonfirmasi')";
 
     $stmt = $conn->prepare($query);
     $stmt->bind_param(
-        "ssii",
+        "ssiis",
         $reservasi['tanggal'],
         $reservasi['waktu'],
         $reservasi['jumlah_tamu'],
-        $reservasi['meja_id']
+        $reservasi['meja_id'],
+        $reservasi['pelanggan_id']
     );
 
     if ($stmt->execute()) {
@@ -37,18 +41,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 
 <head>
-    <title>Konfirmasi Reservasi</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMANRES - Konfirmasi Reservasi</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <h2>Konfirmasi Reservasi</h2>
-    <p>Tanggal: <?php echo $_SESSION['reservasi']['tanggal']; ?></p>
-    <p>Waktu: <?php echo $_SESSION['reservasi']['waktu']; ?></p>
-    <p>Jumlah Tamu: <?php echo $_SESSION['reservasi']['jumlah_tamu']; ?></p>
+    <div>
+        <header class="form-header">
+            <h2>
+                Konfirmasi Reservasi
+            </h2>
+        </header>
+        <div class="konfirmasi-konten">
+            <div class="table-wrapper">
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>Tanggal</th>
+                            <td><?php echo $_SESSION['reservasi']['tanggal']; ?></td>
+                        </tr>
+                        <tr>
+                            <th>Waktu</th>
+                            <td><?php echo $_SESSION['reservasi']['waktu']; ?></td>
+                        </tr>
+                        <tr>
+                            <th>Jumlah Tamu</th>
+                            <td><?php echo $_SESSION['reservasi']['jumlah_tamu']; ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <form method="POST">
+                <button class="button" type="submit">Konfirmasi Reservasi</button>
+            </form>
+        </div>
 
-    <form method="POST">
-        <button type="submit">Konfirmasi Reservasi</button>
-    </form>
+
+    </div>
+
 </body>
 
 </html>
