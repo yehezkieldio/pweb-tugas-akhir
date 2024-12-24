@@ -8,6 +8,24 @@ checkRoleAdmin();
 
 $isAdminUser = isAdmin();
 
+// Query to get the counts
+$orderCountQuery = "SELECT COUNT(*) as count FROM pesanan";
+$tableCountQuery = "SELECT COUNT(*) as count FROM meja";
+$reservationCountQuery = "SELECT COUNT(*) as count FROM reservasi";
+
+// Execute the queries
+$orderCountResult = $conn->query($orderCountQuery);
+$tableCountResult = $conn->query($tableCountQuery);
+$reservationCountResult = $conn->query($reservationCountQuery);
+
+// Fetch the counts
+$orderCount = $orderCountResult->fetch_assoc()['count'];
+$tableCount = $tableCountResult->fetch_assoc()['count'];
+$reservationCount = $reservationCountResult->fetch_assoc()['count'];
+
+// Close the connection
+$conn->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -28,7 +46,7 @@ $isAdminUser = isAdmin();
 
         .card {
             background: #0f172a;
-            border: 1px solid #ddd;
+            border: 1px solid #1e293b;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 20px;
@@ -70,15 +88,15 @@ $isAdminUser = isAdmin();
             <div class="card-container">
                 <div class="card">
                     <div class="card-title">Jumlah Pesanan</div>
-                    <div class="card-content">0</div>
+                    <div class="card-content"><?php echo $orderCount; ?></div>
                 </div>
                 <div class="card">
                     <div class="card-title">Jumlah Meja</div>
-                    <div class="card-content">0</div>
+                    <div class="card-content"><?php echo $tableCount; ?></div>
                 </div>
                 <div class="card">
                     <div class="card-title">Total Reservasi</div>
-                    <div class="card-content">0</div>
+                    <div class="card-content"><?php echo $reservationCount; ?></div>
                 </div>
             </div>
         </div>
