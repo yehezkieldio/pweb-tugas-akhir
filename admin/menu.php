@@ -161,7 +161,9 @@ while ($row = $result->fetch_assoc()) {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($menu_items as $key => $item): ?>
+                            <?php 
+                            sort($menu_items);
+                            foreach ($menu_items as $key => $item): ?>
                                 <tr>
                                     <td><?= htmlspecialchars($item['id']) ?></td>
                                     <td><?= htmlspecialchars($item['nama']) ?></td>

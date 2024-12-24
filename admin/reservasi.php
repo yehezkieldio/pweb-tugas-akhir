@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['create'])) {
     $pelanggan_id = $_POST['pelanggan_id'];
     $status = $_POST['status'];
 
-    $createQuery = "INSERT INTO reservasi (tanggal, time, jumlah_tamu, meja_id, pelanggan_id, status) VALUES (?, ?, ?, ?, ?, ?)";
+    $createQuery = "INSERT INTO reservasi (tanggal, waktu, jumlah_tamu, meja_id, pelanggan_id, status) VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($createQuery);
     $stmt->bind_param("ssiiss", $tanggal, $time, $jumlah_tamu, $meja_id, $pelanggan_id, $status);
 
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit'])) {
     $pelanggan_id = $_POST['pelanggan_id'];
     $status = $_POST['status'];
 
-    $updateQuery = "UPDATE reservasi SET tanggal = ?, time = ?, jumlah_tamu = ?, meja_id = ?, pelanggan_id = ?, status = ? WHERE id = ?";
+    $updateQuery = "UPDATE reservasi SET tanggal = ?, waktu = ?, jumlah_tamu = ?, meja_id = ?, pelanggan_id = ?, status = ? WHERE id = ?";
     $stmt = $conn->prepare($updateQuery);
     $stmt->bind_param("ssiissi", $tanggal, $time, $jumlah_tamu, $meja_id, $pelanggan_id, $status, $id);
 
@@ -216,7 +216,7 @@ while ($row = $result->fetch_assoc()) {
                                value="<?= $editData ? htmlspecialchars($editData['waktu']) : '' ?>" required>
 
                         <label for="jumlah_tamu">Jumlah Tamu:</label>
-                        <input type="number" id="jumlah_tamu" name="jumlah_tamu"
+                        <input type="text" id="jumlah_tamu" name="jumlah_tamu" inputmode="numeric"
                                value="<?= $editData ? htmlspecialchars($editData['jumlah_tamu']) : '' ?>" required>
 
                         <label for="meja_id">Meja:</label>
